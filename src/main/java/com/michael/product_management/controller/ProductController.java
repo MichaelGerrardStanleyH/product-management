@@ -1,9 +1,11 @@
 package com.michael.product_management.controller;
 
 import com.michael.product_management.Service.ProductService;
+import com.michael.product_management.dto.BaseResponse;
 import com.michael.product_management.dto.ProductRequestDTO;
 import com.michael.product_management.dto.ProductResponseDTO;
 import com.michael.product_management.entity.Product;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProduct(){
+    public ResponseEntity<BaseResponse<List<ProductResponseDTO>>> getAllProduct(){
         List<Product> productList = this.productService.getAll();
 
         List<ProductResponseDTO> responseDTOList = productList.stream().map(product -> new ProductResponseDTO(
@@ -31,12 +33,18 @@ public class ProductController {
                 product.getCreatedAt()
         )).toList();
 
+        BaseResponse<List<ProductResponseDTO>> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.OK.value(),
+                responseDTOList
+        );
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") Integer id){
+    public ResponseEntity<BaseResponse<ProductResponseDTO>> getProductById(@PathVariable("id") Integer id){
         Product product = this.productService.getById(id);
 
         ProductResponseDTO productResponseDTO = new ProductResponseDTO(
@@ -47,11 +55,17 @@ public class ProductController {
                 product.getCreatedAt()
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(productResponseDTO);
+        BaseResponse<ProductResponseDTO> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.OK.value(),
+                productResponseDTO
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO dto){
+    public ResponseEntity<BaseResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductRequestDTO dto){
         Product product = productService.create(dto);
 
         ProductResponseDTO productResponseDTO = new ProductResponseDTO(
@@ -62,12 +76,18 @@ public class ProductController {
                 product.getCreatedAt()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDTO);
+        BaseResponse<ProductResponseDTO> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.CREATED.value(),
+                productResponseDTO
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") Integer id, @RequestBody ProductRequestDTO dto){
+    public ResponseEntity<BaseResponse<ProductResponseDTO>> updateProduct(@PathVariable("id") Integer id, @Valid @RequestBody ProductRequestDTO dto){
         Product product = this.productService.update(id, dto);
 
         ProductResponseDTO productResponseDTO = new ProductResponseDTO(
@@ -78,18 +98,30 @@ public class ProductController {
                 product.getCreatedAt()
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(productResponseDTO);
+        BaseResponse<ProductResponseDTO> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.OK.value(),
+                productResponseDTO
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable("id") Integer id){
+    public ResponseEntity<BaseResponse<?>> deleteProduct(@PathVariable("id") Integer id){
         this.productService.delete(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        BaseResponse<String> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.NO_CONTENT.value(),
+                "Delete successfully"
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/names")
-    public ResponseEntity<List<ProductResponseDTO>> searchByNames(@RequestParam("name") String name){
+    public ResponseEntity< BaseResponse<List<ProductResponseDTO>>> searchByNames(@RequestParam("name") String name){
         List<Product> productList = this.productService.getByName(name);
 
         List<ProductResponseDTO> responseDTOList = productList.stream().map(product -> new ProductResponseDTO(
@@ -100,12 +132,17 @@ public class ProductController {
                 product.getCreatedAt()
         )).toList();
 
+        BaseResponse<List<ProductResponseDTO>> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.OK.value(),
+                responseDTOList
+        );
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/prices-between")
-    public ResponseEntity<List<ProductResponseDTO>> searchByNames(
+    public ResponseEntity<BaseResponse<List<ProductResponseDTO>>> searchByNames(
             @RequestParam("min") BigDecimal min,
             @RequestParam("max") BigDecimal max
     ){
@@ -119,8 +156,13 @@ public class ProductController {
                 product.getCreatedAt()
         )).toList();
 
+        BaseResponse<List<ProductResponseDTO>> response = new BaseResponse<>(
+                Boolean.TRUE,
+                HttpStatus.OK.value(),
+                responseDTOList
+        );
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
