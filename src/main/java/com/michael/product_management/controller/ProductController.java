@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public class ProductController {
     ProductService productService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<BaseResponse<List<ProductResponseDTO>>> getAllProduct(){
         List<Product> productList = this.productService.getAll();
 
@@ -44,6 +46,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<BaseResponse<ProductResponseDTO>> getProductById(@PathVariable("id") Integer id){
         Product product = this.productService.getById(id);
 
@@ -65,6 +68,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<BaseResponse<ProductResponseDTO>> createProduct(@Valid @RequestBody ProductRequestDTO dto){
         Product product = productService.create(dto);
 
@@ -82,11 +86,12 @@ public class ProductController {
                 productResponseDTO
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BaseResponse<ProductResponseDTO>> updateProduct(@PathVariable("id") Integer id, @Valid @RequestBody ProductRequestDTO dto){
         Product product = this.productService.update(id, dto);
 
@@ -108,6 +113,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BaseResponse<?>> deleteProduct(@PathVariable("id") Integer id){
         this.productService.delete(id);
 
@@ -117,10 +123,11 @@ public class ProductController {
                 "Delete successfully"
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
     @GetMapping("/names")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity< BaseResponse<List<ProductResponseDTO>>> searchByNames(@RequestParam("name") String name){
         List<Product> productList = this.productService.getByName(name);
 
@@ -142,7 +149,8 @@ public class ProductController {
     }
 
     @GetMapping("/prices-between")
-    public ResponseEntity<BaseResponse<List<ProductResponseDTO>>> searchByNames(
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<BaseResponse<List<ProductResponseDTO>>> searchByPriceRange(
             @RequestParam("min") BigDecimal min,
             @RequestParam("max") BigDecimal max
     ){
