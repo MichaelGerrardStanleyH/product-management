@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -62,5 +63,19 @@ public class ProductServiceImpl implements ProductService{
         );
 
         this.productRepository.delete(existProduct);
+    }
+
+    @Override
+    public List<Product> getByName(String name) {
+        return this.productRepository.findByName(name).orElseThrow(
+                () -> new EntityNotFoundException("no product with name " + name)
+        );
+    }
+
+    @Override
+    public List<Product> getByPriceBetween(BigDecimal min, BigDecimal max) {
+        return this.productRepository.findByPriceBetween(min, max).orElseThrow(
+                () -> new EntityNotFoundException("no product with range price " + min + " to " + max)
+        );
     }
 }

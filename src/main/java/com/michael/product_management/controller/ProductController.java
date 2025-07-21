@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -85,6 +86,41 @@ public class ProductController {
         this.productService.delete(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/names")
+    public ResponseEntity<List<ProductResponseDTO>> searchByNames(@RequestParam("name") String name){
+        List<Product> productList = this.productService.getByName(name);
+
+        List<ProductResponseDTO> responseDTOList = productList.stream().map(product -> new ProductResponseDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCreatedAt()
+        )).toList();
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
+    }
+
+    @GetMapping("/prices-between")
+    public ResponseEntity<List<ProductResponseDTO>> searchByNames(
+            @RequestParam("min") BigDecimal min,
+            @RequestParam("max") BigDecimal max
+    ){
+        List<Product> productList = this.productService.getByPriceBetween(min, max);
+
+        List<ProductResponseDTO> responseDTOList = productList.stream().map(product -> new ProductResponseDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCreatedAt()
+        )).toList();
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTOList);
     }
 
 }
